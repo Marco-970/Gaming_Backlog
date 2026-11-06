@@ -1,0 +1,48 @@
+﻿@page "/backlog"
+
+@using DataLibrary
+@using Gaming_Backlog.Models
+@using Microsoft.Extensions.Configuration
+@inject IDataAccess _data
+@inject IConfiguration _config;
+
+<PageTitle>Backlog</PageTitle>
+
+<h3>Backlog</h3>
+
+@if (games == null)
+{
+    <p><em>Loading your backlog...</em></p>
+}
+else
+{ //table crea una table, thead crea un header, tr crea una row, th crea una header cell nella row, tbody contiene le rows, td è una cell
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genres</th>
+                <th>Interest</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach(var game in games)
+            {
+                <tr>
+                    <td>@game.Title</td>
+                    <td>@game.Genres</td>
+                    <td>@game.Interest</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+        List<BacklogModel> games;
+    protected override async Task OnInitializedAsync()
+    {
+        string query = "SELECT * FROM games_ordered_by_interest";
+        games = await _data.LoadData<BacklogModel, dynamic>(query, new { }, _config.GetConnectionString("default"));
+    }
+}

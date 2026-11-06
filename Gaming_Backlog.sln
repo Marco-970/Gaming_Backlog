@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37628.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gaming_Backlog", "Gaming_Backlog\Gaming_Backlog.csproj", "{AD9156D1-4398-4634-A580-309C9F670FA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{0A8109F2-D9E1-4D8F-8926-63DA8F5B3966}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD9156D1-4398-4634-A580-309C9F670FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD9156D1-4398-4634-A580-309C9F670FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD9156D1-4398-4634-A580-309C9F670FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD9156D1-4398-4634-A580-309C9F670FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A8109F2-D9E1-4D8F-8926-63DA8F5B3966}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A8109F2-D9E1-4D8F-8926-63DA8F5B3966}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A8109F2-D9E1-4D8F-8926-63DA8F5B3966}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A8109F2-D9E1-4D8F-8926-63DA8F5B3966}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2011A8F6-DDE3-4111-919A-36E4F2AA9023}
+	EndGlobalSection
+EndGlobal

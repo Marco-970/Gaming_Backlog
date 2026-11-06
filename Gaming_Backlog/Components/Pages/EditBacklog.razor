@@ -1,0 +1,39 @@
+﻿@page "/edit"
+
+@using DataLibrary
+@* @using Gaming_Backlog.Models *@
+@using Gaming_Backlog.Models
+@using Microsoft.Extensions.Configuration
+@inject IDataAccess _data
+@inject IConfiguration _config;
+
+<PageTitle>EditBacklog</PageTitle>
+
+<h3>EditBacklog</h3>
+
+<input @on
+<button class="btn btn-primary" @onclick="InsertGame">Insert Game</button>
+<button class="btn btn-secondary" @onclick="UpdateGame">Update Game</button>
+<button class="btn btn-danger" @onclick="DeleteGame">Delete Game</button>
+
+@if (games == null)
+{
+    <p><em>Loading your backlog...</em></p>
+}
+
+@code {
+	List<GamesModel> games;
+
+	private Task InsertGame()
+	{
+		throw new NotImplementedException();
+	}
+	private Task UpdateGame()
+	{
+		throw new NotImplementedException();
+	}
+	private Task DeleteGame()
+	{
+		throw new NotImplementedException();
+	}
+}
