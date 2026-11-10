@@ -1,25 +1,50 @@
 ﻿@page "/edit"
-
-@using DataLibrary
-@using Gaming_Backlog.Models
 @using Microsoft.Extensions.Configuration
-@inject IDataAccess _data
-@inject IConfiguration _config;
 
 <PageTitle>EditBacklog</PageTitle>
 
-<h3>EditBacklog</h3>
+<div class="container mt-4">
+	<h3 class="mb-4">Manage Your Backlog</h3>
 
-<div class="nav-item px-3">
-	<NavLink style="animation" class="nav-link" href="insert">
-		<span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Insert Game
-	</NavLink>
-	<NavLink class="nav-link" href="update">
-		<span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Update Game
-	</NavLink>
-	<NavLink class="nav-link" href="delete">
-		<span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Delete Game
-	</NavLink>
+	<div class="row-g-4">
+
+		<div class="col-md-4">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Insert Game</h5>
+					<p class="card-text">
+						Add a new game to your backlog, select its genre and give it an interest level.
+					</p>
+					<NavLink class="btn btn-success" href="/insert">Insert Game</NavLink>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Update Game</h5>
+					<p class="card-text">
+						Change the interest of an existing game in the backlog.
+					</p>
+					<NavLink class="btn btn-primary" href="/update">Update Game</NavLink>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Delete Game</h5>
+					<p class="card-text">
+						Remove a game from the backlog.
+					</p>
+					<NavLink class="btn btn-danger" href="/delete">Delete Game</NavLink>
+				</div>
+			</div>
+		</div>
+
+	</div>
 </div>
 
 @code {
