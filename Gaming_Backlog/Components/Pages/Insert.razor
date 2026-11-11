@@ -2,10 +2,85 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
+@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
+@inject IGameValidator _validator;
 
 <PageTitle>Insert Game</PageTitle>
 
 <h3>Insert Game</h3>
+
+<table class="table table-bordered">
+    <tr class="p-3">
+        <th>Title</th>
+        <th>Release Year</th>
+        <th>Genres</th>
+        <th>Interest</th>
+    </tr>
+
+    <tbody>
+        <tr>
+            <td>
+                <input type="text" @bind="_titleInput" />
+            </td>
+            <td>
+                <input type="number" @bind="_yearInput"/>
+            </td>
+            <td>
+                <select multiple @bind="_genresInput">
+                    @foreach(GenresModel genre in _availableGenres)
+                            {
+                                <option value=@genre.Id>@genre.Name</option>
+                            }
+                </select> 
+            </td>
+            <td>
+                <select @bind="_interestInput">
+                    @for(int i = 1; i < 6; i++)
+                    {
+                        <option value=@i>@i</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </tbody>
+    
+</table>
+
+<div class="p-lg-5 text-center">
+    <button class="btn btn-secondary" @onclick="InsertGame">Execute</button>
+</div>
+
+@code{
+    private List<GenresModel> _availableGenres = new();
+    private string _titleInput = string.Empty;
+    private int? _yearInput = null;
+    private string[] _genresInput = Array.Empty<string>();
+    private int _interestInput = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string genresSql = "SELECT * FROM genres";
+
+        _availableGenres = await _data.LoadData<GenresModel, dynamic>(genresSql, new { }, _config.GetConnectionString("default"));
+    }
+    private async Task InsertGame()
+    {
+        string title = _validator.ValidateTitle(_titleInput);
+        int? date = _validator.ValidateYear(_yearInput);
+        string[] genres = _genresInput;
+        int interest = _interestInput;
+
+        string sqlGameEntry = "INSERT INTO games(title, date, interest) VALUES(@title, @date, @interest)";
+
+        int game_id = await _data.InsertGameAndReturnId(sqlGameEntry, new { title, date, interest }, _config.GetConnectionString("default"));
+
+        for(int i = 0; i < genres.Length; i++)
+        {
+            var genre_id = _availableGenres.Where(availableGenre => availableGenre.Id.ToString() == genres[i]).Select(genre => genre.Id).First();
+            await _data.SaveData("INSERT INTO games_genres(game_id, genre_id) VALUES(@game_id, @genre_id)", new { game_id, genre_id }, _config.GetConnectionString("default"));
+        }
+    }
+}

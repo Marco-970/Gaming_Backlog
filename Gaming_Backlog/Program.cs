@@ -1,5 +1,6 @@
 using DataLibrary;
 using Gaming_Backlog.Components;
+using Gaming_Backlog.Tools;
 
 namespace Gaming_Backlog
 {
@@ -13,6 +14,7 @@ namespace Gaming_Backlog
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             builder.Services.AddSingleton<IDataAccess, DataAccess>();
+            builder.Services.AddSingleton<IGameValidator, GameValidator>();
 
             var app = builder.Build();
 
