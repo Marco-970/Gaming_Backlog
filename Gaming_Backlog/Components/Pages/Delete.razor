@@ -2,10 +2,56 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
+@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
+@inject IGameValidator _validator;
 
 <PageTitle>Delete Game</PageTitle>
 
 <h3>Delete Game</h3>
+
+<table class="table table-bordered">
+    <tr class="p-3">
+        <th>Title</th>
+    </tr>
+
+    <tbody>
+        <tr>
+            <td>
+                <select @bind="_titleInput">
+                    @foreach (GamesModel game in _games)
+                    {
+                        <option value=@game.Title>@game.Title</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+
+<div class="p-lg-5 text-center">
+    <button class="btn btn-secondary" @onclick="DeleteGame">Execute</button>
+</div>
+
+@code{
+    private string _titleInput = string.Empty;
+
+    private List<GamesModel> _games = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string gamesSql = "SELECT * FROM games ORDER BY title";
+
+        _games = await _data.LoadData<GamesModel, dynamic>(gamesSql, new { }, _config.GetConnectionString("default"));
+    }
+
+    private async Task DeleteGame()
+    {
+        string title = _validator.ValidateTitle(_titleInput);
+
+        await _data.DeleteData("DELETE FROM games WHERE title LIKE @title", new { title }, _config.GetConnectionString("default"));
+    }
+}

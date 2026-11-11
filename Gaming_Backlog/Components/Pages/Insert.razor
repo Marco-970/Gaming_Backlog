@@ -77,10 +77,18 @@
 
         int game_id = await _data.InsertGameAndReturnId(sqlGameEntry, new { title, date, interest }, _config.GetConnectionString("default"));
 
-        for(int i = 0; i < genres.Length; i++)
+        try
         {
-            var genre_id = _availableGenres.Where(availableGenre => availableGenre.Id.ToString() == genres[i]).Select(genre => genre.Id).First();
-            await _data.SaveData("INSERT INTO games_genres(game_id, genre_id) VALUES(@game_id, @genre_id)", new { game_id, genre_id }, _config.GetConnectionString("default"));
+            for (int i = 0; i < genres.Length; i++)
+            {
+                var genre_id = _availableGenres.Where(availableGenre => availableGenre.Id.ToString() == genres[i]).Select(genre => genre.Id).First();
+                await _data.SaveData("INSERT INTO games_genres(game_id, genre_id) VALUES(@game_id, @genre_id)", new { game_id, genre_id }, _config.GetConnectionString("default"));
+            }
         }
+        catch(Exception ex)
+        {
+            await _data.DeleteData("DELETE FROM games WHERE title LIKE '@title'", new { }, _config.GetConnectionString("default"));
+        }
+
     }
 }
