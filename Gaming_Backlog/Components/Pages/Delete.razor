@@ -52,6 +52,6 @@
     {
         string title = _validator.ValidateTitle(_titleInput);
 
-        await _data.DeleteData("DELETE FROM games WHERE title LIKE @title", new { title }, _config.GetConnectionString("default"));
+        await _data.SaveData("DELETE FROM games WHERE title LIKE @title", new { title }, _config.GetConnectionString("default"));
     }
 }
