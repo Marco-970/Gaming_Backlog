@@ -87,7 +87,7 @@
         }
         catch(Exception ex)
         {
-            await _data.DeleteData("DELETE FROM games WHERE title LIKE '@title'", new { }, _config.GetConnectionString("default"));
+            await _data.SaveData("DELETE FROM games WHERE title LIKE '@title'", new { }, _config.GetConnectionString("default"));
         }
 
     }

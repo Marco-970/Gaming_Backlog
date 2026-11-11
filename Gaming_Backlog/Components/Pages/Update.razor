@@ -2,10 +2,65 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
+@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
+@inject IGameValidator _validator;
 
 <PageTitle>Update Game</PageTitle>
 
 <h3>Update Game</h3>
+
+<table class="table table-bordered">
+    <tr class="p-3">
+        <th>Title</th>
+        <th>Interest</th>
+    </tr>
+
+    <tbody>
+        <tr>
+            <td>
+                <select @bind="_titleInput">
+                    @foreach (GamesModel game in _games)
+                    {
+                        <option value=@game.Title>@game.Title</option>
+                    }
+                </select>
+            </td>
+            <td>
+                <select @bind="_interestInput">
+                    @for(int i = 1; i < 6; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+
+<div class="p-lg-5 text-center">
+    <button class="btn btn-secondary" @onclick="UpdateGame">Execute</button>
+</div>
+
+@code{
+    private string _titleInput = string.Empty;
+    private int _interestInput = 1;
+    List<GamesModel> _games = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string gamesSql = "SELECT * FROM games ORDER BY title";
+
+        _games = await _data.LoadData<GamesModel, dynamic>(gamesSql, new { }, _config.GetConnectionString("default"));
+    }
+
+    private async Task UpdateGame()
+    {
+        string title = _validator.ValidateTitle(_titleInput);
+        int interest = _interestInput;
+        await _data.SaveData("UPDATE games SET interest = @interest WHERE title LIKE @title", new { title, interest }, _config.GetConnectionString("default"));
+    }
+}
