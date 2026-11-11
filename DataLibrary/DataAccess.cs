@@ -27,5 +27,14 @@ namespace DataLibrary
                 await connection.ExecuteAsync(sql, parameters);
             }
         }
+
+        public async Task<int> InsertGameAndReturnId<T>(string sql, T parameters, string connectionString)
+        {
+            using (IDbConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.ExecuteAsync(sql, parameters);
+                return await connection.QuerySingleAsync<int>("SELECT LAST_INSERT_ID()"); 
+            }
+        }
     }
 }
