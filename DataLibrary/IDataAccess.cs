@@ -9,6 +9,7 @@ namespace DataLibrary
     public interface IDataAccess
     {
         Task<List<T>> LoadData<T, U>(string query, U parameters, string connectionString);
+        Task<int> LoadId<T, U>(string sql, U parameters, string connectionString);
         Task SaveData<T>(string query, T parameters, string connectionString);
         Task<int> InsertGameAndReturnId<T>(string sql, T parameters, string connectionString);
     }
