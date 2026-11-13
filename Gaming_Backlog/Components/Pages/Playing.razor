@@ -3,11 +3,9 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
-@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
-@inject IGameValidator _validator;
 
 <h3>Playing</h3>
 
@@ -54,8 +52,32 @@
     </tbody>
 </table>
 
+@if (_showError)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Game not found!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showError = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string _titleInput = string.Empty;
+    private bool _showError = false;
     string playingSql = "SELECT * FROM currently_playing_games";
 
     List<GamesModel> _games = new();
@@ -79,7 +101,7 @@
     }
     private async Task RemovePlaying()
     {
-        string title = _validator.ValidateTitle(_titleInput);
+        string title = _titleInput;
         string getIdSql = "SELECT id FROM games WHERE title LIKE @title";
 
         var game_id = await _data.LoadId<int, dynamic>(getIdSql, new { title }, _config.GetConnectionString("default"));
@@ -90,7 +112,7 @@
         }
         catch(Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _showError = true;
         }
     }
 }

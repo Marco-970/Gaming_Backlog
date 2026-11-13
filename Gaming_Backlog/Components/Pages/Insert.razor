@@ -2,11 +2,9 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
-@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
-@inject IGameValidator _validator;
 
 <PageTitle>Insert Game</PageTitle>
 
@@ -57,15 +55,64 @@
     
 </table>
 <div class="p-lg-5 text-center">
-    <button type="submit" class="btn btn-secondary" @onclick="InsertGame">Execute</button>
+    <button type="submit" class="btn btn-secondary">Execute</button>
 </div>
+
 </EditForm>
+
+@if (_showGenreError)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Validation Error</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You must select at least one genre!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showGenreError = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showSuccess)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Success</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Game added successfully!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showSuccess = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 
 @code{
     private GamesModel _gameInput = new();
     private List<GenresModel> _availableGenres = new();
     private string[] _genresInput = Array.Empty<string>();
+    private bool _showGenreError = false;
+    private bool _showSuccess = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,6 +122,13 @@
     }
     private async Task InsertGame()
     {
+        if (_genresInput.Length <= 0)
+        {
+            _showGenreError = true;
+            return;
+        }
+        _showGenreError = false;
+        
         string title = _gameInput.Title;
         int? date = _gameInput.ReleaseYear;
         string[] genres = _genresInput;
@@ -82,7 +136,9 @@
 
         string sqlGameEntry = "INSERT INTO games(title, date, interest) VALUES(@title, @date, @interest)";
 
+        
         int game_id = await _data.InsertGameAndReturnId(sqlGameEntry, new { title, date, interest }, _config.GetConnectionString("default"));
+
 
         try
         {
@@ -91,10 +147,12 @@
                 var genre_id = _availableGenres.Where(availableGenre => availableGenre.Id.ToString() == genres[i]).Select(genre => genre.Id).First();
                 await _data.SaveData("INSERT INTO games_genres(game_id, genre_id) VALUES(@game_id, @genre_id)", new { game_id, genre_id }, _config.GetConnectionString("default"));
             }
+            _showSuccess = true;
+
         }
         catch(Exception ex)
         {
-            await _data.SaveData("DELETE FROM games WHERE title LIKE '@title'", new { }, _config.GetConnectionString("default"));
+            await _data.SaveData("DELETE FROM games WHERE id = @game_id", new { }, _config.GetConnectionString("default"));
         }
 
     }

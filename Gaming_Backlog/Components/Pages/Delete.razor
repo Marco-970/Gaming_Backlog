@@ -2,11 +2,9 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
-@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
-@inject IGameValidator _validator;
 
 <PageTitle>Delete Game</PageTitle>
 
@@ -36,8 +34,32 @@
     <button class="btn btn-secondary" @onclick="DeleteGame">Execute</button>
 </div>
 
+@if (_showSuccess)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Success</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Game deleted successfully!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showSuccess = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code{
     private string _titleInput = string.Empty;
+    private bool _showSuccess = false;
 
     private List<GamesModel> _games = new();
 
@@ -53,5 +75,6 @@
         string title = _titleInput;
 
         await _data.SaveData("DELETE FROM games WHERE title LIKE @title", new { title }, _config.GetConnectionString("default"));
+        _showSuccess = true;
     }
 }
