@@ -50,7 +50,7 @@
 
     private async Task DeleteGame()
     {
-        string title = _validator.ValidateTitle(_titleInput);
+        string title = _titleInput;
 
         await _data.SaveData("DELETE FROM games WHERE title LIKE @title", new { title }, _config.GetConnectionString("default"));
     }

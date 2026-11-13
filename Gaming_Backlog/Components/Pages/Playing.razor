@@ -70,7 +70,7 @@
 
     private async Task AddPlaying()
     {
-        string title = _validator.ValidateTitle(_titleInput);
+        string title = _titleInput;
         string getIdSql = "SELECT id FROM games WHERE title LIKE @title";
 
         var game_id = await _data.LoadId<int, dynamic>(getIdSql, new { title }, _config.GetConnectionString("default"));

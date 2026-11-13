@@ -59,7 +59,7 @@
 
     private async Task UpdateGame()
     {
-        string title = _validator.ValidateTitle(_titleInput);
+        string title = _titleInput;
         int interest = _interestInput;
         await _data.SaveData("UPDATE games SET interest = @interest WHERE title LIKE @title", new { title, interest }, _config.GetConnectionString("default"));
     }
