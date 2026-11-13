@@ -1,0 +1,118 @@
+﻿@page "/playing"
+@rendermode InteractiveServer
+
+@using DataLibrary
+@using Gaming_Backlog.Models
+@using Microsoft.Extensions.Configuration
+@inject IDataAccess _data
+@inject IConfiguration _config;
+
+<h3>Playing</h3>
+
+<table class="table table-bordered">
+
+    <tr class="p-3">
+        <th>Title To Add / Remove</th>
+    </tr>
+
+    <tbody>
+        <tr>
+            <td>
+                <select @bind="_titleInput">
+                    @foreach (GamesModel game in _games)
+                    {
+                        <option value=@game.Title>@game.Title</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+
+<div class="p-lg-5 text-center">
+    <button class="btn btn-secondary" @onclick="AddPlaying">Add Game</button>
+    <button class="btn btn-secondary" @onclick="RemovePlaying">Remove Game</button>
+</div>
+
+<table class="table table-bordered">
+    <tr class="p-3">
+        <th>Playing</th>
+    </tr>
+
+    <tbody>
+        @foreach (var game in _currentlyPlaying)
+        {
+            <tr>
+                <td>@game.Title</td>
+                <td>@game.Added.Date.ToShortDateString()</td>
+                <td>@game.Started.Date.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (_showError)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Game not found!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showError = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string _titleInput = string.Empty;
+    private bool _showError = false;
+    string playingSql = "SELECT * FROM currently_playing_games";
+
+    List<GamesModel> _games = new();
+    List<CurrentlyPlayingModel> _currentlyPlaying = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string gamesSql = "SELECT * FROM games ORDER BY title";
+        _games = await _data.LoadData<GamesModel, dynamic>(gamesSql, new { }, _config.GetConnectionString("default"));
+        _currentlyPlaying = await _data.LoadData<CurrentlyPlayingModel, dynamic>(playingSql, new { }, _config.GetConnectionString("default"));
+    }
+
+    private async Task AddPlaying()
+    {
+        string title = _titleInput;
+        string getIdSql = "SELECT id FROM games WHERE title LIKE @title";
+
+        var game_id = await _data.LoadId<int, dynamic>(getIdSql, new { title }, _config.GetConnectionString("default"));
+        await _data.SaveData("INSERT INTO currently_playing(game_id) VALUES(@game_id)", new { game_id }, _config.GetConnectionString("default"));
+        _currentlyPlaying = await _data.LoadData<CurrentlyPlayingModel, dynamic>(playingSql, new { }, _config.GetConnectionString("default"));
+    }
+    private async Task RemovePlaying()
+    {
+        string title = _titleInput;
+        string getIdSql = "SELECT id FROM games WHERE title LIKE @title";
+
+        var game_id = await _data.LoadId<int, dynamic>(getIdSql, new { title }, _config.GetConnectionString("default"));
+        try
+        {
+            await _data.SaveData("DELETE FROM currently_playing WHERE game_id LIKE @game_id", new { game_id }, _config.GetConnectionString("default"));
+            _currentlyPlaying = await _data.LoadData<CurrentlyPlayingModel, dynamic>(playingSql, new { }, _config.GetConnectionString("default"));
+        }
+        catch(Exception ex)
+        {
+            _showError = true;
+        }
+    }
+}
