@@ -12,6 +12,11 @@
 
 <h3>Insert Game</h3>
 
+<EditForm Model="_gameInput" OnValidSubmit="InsertGame">
+
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
 <table class="table table-bordered">
     <tr class="p-3">
         <th>Title</th>
@@ -23,10 +28,12 @@
     <tbody>
         <tr>
             <td>
-                <input type="text" @bind="_titleInput" />
+                <InputText @bind-Value="_gameInput.Title"/>
+                <ValidationMessage For="@(() => _gameInput.Title)" />
             </td>
             <td>
-                <input type="number" @bind="_yearInput"/>
+                <InputNumber @bind-Value="_gameInput.ReleaseYear" />
+                <ValidationMessage For="@(() => _gameInput.ReleaseYear)"/>
             </td>
             <td>
                 <select multiple @bind="_genresInput">
@@ -37,28 +44,28 @@
                 </select> 
             </td>
             <td>
-                <select @bind="_interestInput">
+                <InputSelect @bind-Value="_gameInput.Interest">
                     @for(int i = 1; i < 6; i++)
                     {
                         <option value=@i>@i</option>
                     }
-                </select>
+                </InputSelect>
+                <ValidationMessage For="@(() => _gameInput.Interest)"/>
             </td>
         </tr>
     </tbody>
     
 </table>
-
 <div class="p-lg-5 text-center">
-    <button class="btn btn-secondary" @onclick="InsertGame">Execute</button>
+    <button type="submit" class="btn btn-secondary" @onclick="InsertGame">Execute</button>
 </div>
+</EditForm>
+
 
 @code{
+    private GamesModel _gameInput = new();
     private List<GenresModel> _availableGenres = new();
-    private string _titleInput = string.Empty;
-    private int? _yearInput = null;
     private string[] _genresInput = Array.Empty<string>();
-    private int _interestInput = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,10 +75,10 @@
     }
     private async Task InsertGame()
     {
-        string title = _validator.ValidateTitle(_titleInput);
-        int? date = _validator.ValidateYear(_yearInput);
+        string title = _gameInput.Title;
+        int? date = _gameInput.ReleaseYear;
         string[] genres = _genresInput;
-        int interest = _interestInput;
+        int interest = _gameInput.Interest;
 
         string sqlGameEntry = "INSERT INTO games(title, date, interest) VALUES(@title, @date, @interest)";
 
