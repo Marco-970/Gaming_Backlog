@@ -2,11 +2,9 @@
 
 @using DataLibrary
 @using Gaming_Backlog.Models
-@using Gaming_Backlog.Tools
 @using Microsoft.Extensions.Configuration
 @inject IDataAccess _data
 @inject IConfiguration _config;
-@inject IGameValidator _validator;
 
 <PageTitle>Update Game</PageTitle>
 
@@ -45,9 +43,33 @@
     <button class="btn btn-secondary" @onclick="UpdateGame">Execute</button>
 </div>
 
+@if (_showSuccess)
+{
+    <div class="modal-backdrop show">
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Success</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Game updated successfully!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="() => _showSuccess = false">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code{
     private string _titleInput = string.Empty;
     private int _interestInput = 1;
+    private bool _showSuccess = false;
     List<GamesModel> _games = new();
 
     protected override async Task OnInitializedAsync()
@@ -62,5 +84,6 @@
         string title = _titleInput;
         int interest = _interestInput;
         await _data.SaveData("UPDATE games SET interest = @interest WHERE title LIKE @title", new { title, interest }, _config.GetConnectionString("default"));
+        _showSuccess = true;
     }
 }
